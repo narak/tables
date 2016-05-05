@@ -1,4 +1,4 @@
-[ { firstName: 'Tara',
+module.exports = [ { firstName: 'Tara',
     lastName: 'Bashirian',
     city: 'South Brooks',
     zipCode: '67912-5522',
@@ -4197,4 +4197,4 @@
     account: '67370256',
     accountName: 'Investment Account',
     ip: '195.147.218.122',
-    userAgent: 'Mozilla/5.0 (Windows; U; Windows NT 5.3) AppleWebKit/534.0.1 (KHTML, like Gecko) Chrome/39.0.853.0 Safari/534.0.1' } ]
+    userAgent: 'Mozilla/5.0 (Windows; U; Windows NT 5.3) AppleWebKit/534.0.1 (KHTML, like Gecko) Chrome/39.0.853.0 Safari/534.0.1' } ];

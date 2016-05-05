@@ -1,4 +1,4 @@
-[ { firstName: 'Magnolia',
+module.exports = [ { firstName: 'Magnolia',
     lastName: 'Crist',
     city: 'Port Valentin',
     zipCode: '71933',
@@ -2076,4 +2076,4 @@
     account: '99450918',
     accountName: 'Personal Loan Account',
     ip: '81.113.206.1',
-    userAgent: 'Mozilla/5.0 (Windows; U; Windows NT 5.1) AppleWebKit/535.1.0 (KHTML, like Gecko) Chrome/19.0.892.0 Safari/535.1.0' } ]
+    userAgent: 'Mozilla/5.0 (Windows; U; Windows NT 5.1) AppleWebKit/535.1.0 (KHTML, like Gecko) Chrome/19.0.892.0 Safari/535.1.0' } ];

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Table</title>
+    <link rel="stylesheet" href="">
+</head>
+<body>
+<div id="loading">Loading...</div>
+<table id="table">
+</table>
+<script src="/js/table.js"></script>
+<script src="/js/helpers.js"></script>
+<script>
+var table = new Table(document.getElementById('table'));
+
+table.setCols([
+    {title: 'First Name', key: 'firstName'},
+    {title: 'Last Name', key: 'lastName'},
+    {title: 'City', key: 'city'},
+    {title: 'Zip Code', key: 'zipCode'},
+    {title: 'Country', key: 'country'},
+    {title: 'State', key: 'state'},
+    {title: 'User Name', key: 'userName'},
+    {title: 'Phone Number', key: 'phoneNumber'},
+    {title: 'Email', key: 'email'},
+    {title: 'Amount', key: 'amount'},
+
+    {title: 'Catch Phrase', key: 'catchPhrase'},
+    {title: 'Company Name', key: 'companyName'},
+
+    {title: 'Created Date', key: 'createdDate'},
+    {title: 'Modified Date', key: 'modifiedDate'},
+
+    {title: 'Title', key: 'title'},
+    {title: 'Job Title', key: 'jobTitle'},
+    {title: 'Job Type', key: 'jobType'},
+
+    {title: 'Account', key: 'account'},
+    {title: 'Account Name', key: 'accountName'},
+
+    {title: 'IP', key: 'ip'},
+    {title: 'UserAgent', key: 'userAgent'},
+]);
+
+fetch('/data', d => {
+    table.setData(d.rows);
+    table.setTotalRecords(d.totalRecords);
+    table.setPageSize(d.limit);
+});
+
+// This event occurs only if Table recognizes that the total records is greater than
+// the data it already has.
+table.on('fetch', (filters, callback) => {
+    fetch('/data?' + helpers.queryParams.stringify(filters), d => {
+        callback(d.rows);
+    });
+});
+</script>
+</body>
+</html>

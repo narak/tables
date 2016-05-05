@@ -8,6 +8,8 @@
   },
   "author": "karansheth@gmail.com",
   "dependencies": {
+    "compression": "^1.6.1",
+    "express": "^4.13.4"
   },
   "devDependencies": {
     "command-line-args": "^2.1.6",
