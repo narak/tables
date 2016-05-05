@@ -4,18 +4,20 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>Table</title>
-    <link rel="stylesheet" href="">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,600' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/table.css">
 </head>
 <body>
 <div id="loading">Loading...</div>
 <table id="table">
 </table>
 <script src="/js/table.js"></script>
-<script src="/js/helpers.js"></script>
+<!--script src="/js/helpers.js"></script-->
 <script>
-var table = new Table(document.getElementById('table'));
+var table = Table(document.getElementById('table'));
 
-table.setCols([
+table.setColumns([
     {title: 'First Name', key: 'firstName'},
     {title: 'Last Name', key: 'lastName'},
     {title: 'City', key: 'city'},
@@ -44,19 +46,24 @@ table.setCols([
     {title: 'UserAgent', key: 'userAgent'},
 ]);
 
-fetch('/data', d => {
+fetch('/data').then(res => {
+    return res.json();
+}).then(d => {
     table.setData(d.rows);
     table.setTotalRecords(d.totalRecords);
     table.setPageSize(d.limit);
+    table.render();
+    document.getElementById('loading').remove();
 });
+
 
 // This event occurs only if Table recognizes that the total records is greater than
 // the data it already has.
-table.on('fetch', (filters, callback) => {
-    fetch('/data?' + helpers.queryParams.stringify(filters), d => {
-        callback(d.rows);
-    });
-});
+// table.on('fetch', (filters, callback) => {
+//     fetch('/data?' + helpers.queryParams.stringify(filters), d => {
+//         callback(d.rows);
+//     });
+// });
 </script>
 </body>
 </html>
