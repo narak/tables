@@ -10,63 +10,20 @@
 </head>
 <body>
 <div id="loading">Loading...</div>
-<table id="table" cellspacing="0"></table>
-<script src="/js/table.js"></script>
+<div class="table-container">
+    <div class="per-page">
+        Per Page:
+        <select class="per-page-count">
+            <option>10</option>
+            <option selected>25</option>
+            <option>50</option>
+            <option>100</option>
+        </select>
+    </div>
+    <div class="search">Search: <input type="text" class="search-field" /></div>
+</div>
 <script src="/js/helpers.js"></script>
 <script src="/js/table.js"></script>
-<script>
-var table = Table(document.querySelector('.table-container'));
-
-table.setColumns([
-    {title: 'First Name', key: 'firstName'},
-    {title: 'Last Name', key: 'lastName'},
-    {title: 'City', key: 'city'},
-    {title: 'Zip Code', key: 'zipCode'},
-    {title: 'Country', key: 'country'},
-    {title: 'State', key: 'state'},
-    {title: 'User Name', key: 'userName'},
-    {title: 'Phone Number', key: 'phoneNumber'},
-    {title: 'Email', key: 'email'},
-    {title: 'Amount', key: 'amount', type: Table.ColumnTypes.number},
-
-    {title: 'Catch Phrase', key: 'catchPhrase'},
-    {title: 'Company Name', key: 'companyName'},
-
-    {title: 'Created Date', key: 'createdDate', type: Table.ColumnTypes.date},
-    {title: 'Modified Date', key: 'modifiedDate', type: Table.ColumnTypes.date},
-
-    {title: 'Title', key: 'title'},
-    {title: 'Job Title', key: 'jobTitle'},
-    {title: 'Job Type', key: 'jobType'},
-
-    {title: 'Account', key: 'account'},
-    {title: 'Account Name', key: 'accountName'},
-
-    {title: 'IP', key: 'ip'},
-    {title: 'UserAgent', key: 'userAgent'},
-]);
-
-const MAX_ROWS = 99;
-fetch(`/data/${MAX_ROWS}/`, { params: {abc: 'zys'}})
-    .then(res => res.json())
-    .then(d => {
-        table.setData(d.rows);
-        table.setTotalRecords(d.totalRecords);
-        table.setPageSize(d.limit);
-        table.render();
-        document.getElementById('loading').remove();
-    });
-
-
-// This event occurs only if Table recognizes that the total records is greater than
-// the data it already has.
-table.onFetch = (filters, callback) => {
-    fetch(`/data/${MAX_ROWS}/?${Helpers.QueryString.stringify(filters)}`)
-        .then(res => res.json())
-        .then(d => {
-            callback(d.rows);
-        });
-}
-</script>
+<script src="/js/main.js"></script>
 </body>
 </html>

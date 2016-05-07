@@ -9,3 +9,21 @@ body {
     font-family: 'Open Sans', sans-serif;
     font-size: 12px;
 }
+
+select,
+input {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 12px;
+    padding: 5px 8px;
+}
+
+.per-page {
+    padding: 8px;
+    margin: 0 0 10px;
+}
+
+.search {
+    position: absolute;
+    right: 32px;
+    top: 32px;
+}
