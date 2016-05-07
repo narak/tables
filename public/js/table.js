@@ -1,67 +1,6 @@
 'use strict';
 
-function isArray(obj) {
-    return Object.prototype.toString.call(obj) === '[object Array]';
-}
-
-function appendChild(dom, child) {
-    if (typeof child === 'string') {
-        dom.innerText = child;
-    } else {
-        dom.appendChild(child);
-    }
-}
-
-function removeChildren(dom) {
-    while (dom.firstChild) {
-        dom.removeChild(dom.firstChild);
-    }
-    return dom;
-}
-
-function DOMElement(type, props, children) {
-    let dom = document.createElement(type);
-
-    if (isArray(props) || props instanceof HTMLElement || typeof props === 'string') {
-        children = props;
-        props = null;
-    }
-
-    if (props) {
-        Object.keys(props).forEach(p => {
-            dom.setAttribute(p, props[p]);
-        });
-    }
-
-    if (isArray(children)) {
-        children.forEach(child => {
-            appendChild(dom, child);
-        });
-    } else if (children) {
-        appendChild(dom, children);
-    }
-    return dom;
-}
-
-function THead(...args) {
-    return DOMElement('thead', ...args);
-}
-
-function TBody(...args) {
-    return DOMElement('tbody', ...args);
-}
-
-function TR(...args) {
-    return DOMElement('tr', ...args);
-}
-
-function TH(...args) {
-    return DOMElement('th', ...args);
-}
-
-function TD(...args) {
-    return DOMElement('td', ...args);
-}
+let DOM = Helpers.DOM;
 
 const ColumnTypes = {
     number: 'number',
@@ -85,9 +24,9 @@ function getCellAttrs(col, data) {
     }
 }
 
-function Table($table) {
+function Table($container) {
     let cols, data, pageSize, totalRecords;
-    let $thead, $tbody;
+    let $table, $thead, $tbody;
 
     return {
         setColumns: _cols => cols = _cols,
@@ -96,16 +35,17 @@ function Table($table) {
         setTotalRecords: _totalRecords => totalRecords = _totalRecords,
 
         render() {
-            $thead = THead(TR(cols.map(col => TH(getCellAttrs(col), col.title))));
-            $tbody = TBody();
+            $thead = DOM.thead(DOM.tr(cols.map(col => DOM.th(getCellAttrs(col), [col.title, /*DOM.div(col.title)*/]))));
+            $tbody = DOM.tbody();
+            $table = DOM.table({'cellspacing': 0}, [$thead, $tbody]);
+            $container.appendChild(DOM.div({class: 'table-scroll'}, $table));
+
             this.renderData();
-            $table.appendChild($thead);
-            $table.appendChild($tbody);
         },
 
         renderData() {
-            removeChildren($tbody);
-            data.forEach(d => $tbody.appendChild(TR(cols.map(col => TD(getCellAttrs(col, d[col.key]), d[col.key])))));
+            DOM.removeChildren($tbody);
+            data.forEach(d => $tbody.appendChild(DOM.tr(cols.map(col => DOM.td(getCellAttrs(col, d[col.key]), d[col.key])))));
         }
     }
 };

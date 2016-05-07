@@ -13,8 +13,9 @@
 <table id="table" cellspacing="0"></table>
 <script src="/js/table.js"></script>
 <script src="/js/helpers.js"></script>
+<script src="/js/table.js"></script>
 <script>
-var table = Table(document.getElementById('table'));
+var table = Table(document.querySelector('.table-container'));
 
 table.setColumns([
     {title: 'First Name', key: 'firstName'},
@@ -45,7 +46,7 @@ table.setColumns([
     {title: 'UserAgent', key: 'userAgent'},
 ]);
 
-const MAX_ROWS = 500;
+const MAX_ROWS = 99;
 fetch(`/data/${MAX_ROWS}/`, { params: {abc: 'zys'}})
     .then(res => res.json())
     .then(d => {
