@@ -17,11 +17,34 @@ th {
 }
 
 th {
+    position: relative;
     padding: 8px 25px 8px 10px;
     white-space: nowrap;
     text-align: left;
     background: #f1f1f1;
     border: 1px solid #ccc;
+}
+
+.sort-asc-arrow {
+    position: absolute;
+    right: 8px;
+    top: 10px;
+    display: inline-block;
+    border-bottom: 6px solid #000;
+    border-top: 0;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+}
+
+.sort-desc-arrow {
+    position: absolute;
+    right: 8px;
+    top: 18px;
+    display: inline-block;
+    border-top: 6px solid #000;
+    border-bottom: 0;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
 }
 
 td {

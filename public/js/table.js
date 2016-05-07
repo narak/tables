@@ -45,8 +45,8 @@ function Table($container) {
 
     /**
      * Careful when you use this. You don't want to add refs to elements that are going to be
-     * destroyed. Unless a mechanism for removing the element reference from this map is made,
-     * those elements won't get garbage collected.
+     * destroyed. Unless a mechanism for removing the element reference from this map is put in
+     * place, those elements won't get garbage collected.
      */
     function ref(key, dom) {
         if (dom) {
@@ -102,7 +102,11 @@ function Table($container) {
     function render() {
         let $thead = DOM.thead(
                 DOM.tr(cols.map(
-                    col => ref(`th:${col.title}`, DOM.th(getCellAttrs(col), [col.title]))
+                    col => ref(`th:${col.title}`, DOM.th(getCellAttrs(col), [
+                        col.title,
+                        DOM.div({class: 'sort-asc-arrow'}),
+                        DOM.div({class: 'sort-desc-arrow'})
+                    ]))
                 ))
             ),
             $table = DOM.table({'cellspacing': '0'}, [$thead, ref('tbody', DOM.tbody())]);
