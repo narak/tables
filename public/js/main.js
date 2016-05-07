@@ -35,7 +35,7 @@ fetch(`/data/${MAX_ROWS}/`, { params: {abc: 'zys'}})
     .then(d => {
         table.setData(d.rows);
         table.setTotalRecords(d.totalRecords);
-        table.setPageSize(25);
+        table.setPageSize(10);
         table.render();
         document.getElementById('loading').remove();
     });

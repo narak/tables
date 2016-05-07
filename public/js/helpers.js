@@ -18,7 +18,7 @@ window.Helpers = (function() {
             if (isArray(children)) {
                 children.forEach(child => DOM.appendChild(dom, child));
             } else {
-                if (typeof children === 'string') {
+                if (typeof children === 'string' || typeof children === 'number') {
                     children = document.createTextNode(children);
                 }
                 dom.appendChild(children);
@@ -34,7 +34,8 @@ window.Helpers = (function() {
         Element(type, props, children) {
             let dom = document.createElement(type);
 
-            if (isArray(props) || props instanceof HTMLElement || typeof props === 'string') {
+            if (isArray(props) || props instanceof HTMLElement ||
+                    typeof props === 'string' || typeof props === 'number') {
                 children = props;
                 props = null;
             }
