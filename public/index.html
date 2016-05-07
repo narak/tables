@@ -10,10 +10,9 @@
 </head>
 <body>
 <div id="loading">Loading...</div>
-<table id="table">
-</table>
+<table id="table" cellspacing="0"></table>
 <script src="/js/table.js"></script>
-<!--script src="/js/helpers.js"></script-->
+<script src="/js/helpers.js"></script>
 <script>
 var table = Table(document.getElementById('table'));
 
@@ -46,24 +45,27 @@ table.setColumns([
     {title: 'UserAgent', key: 'userAgent'},
 ]);
 
-fetch('/data').then(res => {
-    return res.json();
-}).then(d => {
-    table.setData(d.rows);
-    table.setTotalRecords(d.totalRecords);
-    table.setPageSize(d.limit);
-    table.render();
-    document.getElementById('loading').remove();
-});
+const MAX_ROWS = 500;
+fetch(`/data/${MAX_ROWS}/`, { params: {abc: 'zys'}})
+    .then(res => res.json())
+    .then(d => {
+        table.setData(d.rows);
+        table.setTotalRecords(d.totalRecords);
+        table.setPageSize(d.limit);
+        table.render();
+        document.getElementById('loading').remove();
+    });
 
 
 // This event occurs only if Table recognizes that the total records is greater than
 // the data it already has.
-// table.on('fetch', (filters, callback) => {
-//     fetch('/data?' + helpers.queryParams.stringify(filters), d => {
-//         callback(d.rows);
-//     });
-// });
+table.onFetch = (filters, callback) => {
+    fetch(`/data/${MAX_ROWS}/?${Helpers.QueryString.stringify(filters)}`)
+        .then(res => res.json())
+        .then(d => {
+            callback(d.rows);
+        });
+}
 </script>
 </body>
 </html>
