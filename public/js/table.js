@@ -12,6 +12,13 @@ function appendChild(dom, child) {
     }
 }
 
+function removeChildren(dom) {
+    while (dom.firstChild) {
+        dom.removeChild(dom.firstChild);
+    }
+    return dom;
+}
+
 function DOMElement(type, props, children) {
     let dom = document.createElement(type);
 
@@ -56,9 +63,31 @@ function TD(...args) {
     return DOMElement('td', ...args);
 }
 
+const ColumnTypes = {
+    number: 'number',
+    date: 'date'
+};
 
-window.Table = function($table) {
-    let cols, data, pageSize, totalRecords, dom;
+const TypeClassMap = {
+    [ColumnTypes.number]: 'table-cell-number',
+    [ColumnTypes.date]: 'table-cell-date'
+};
+
+function getCellAttrs(col, data) {
+    if (col.type) {
+        let attrs = {
+            class: TypeClassMap[col.type]
+        };
+        if (data) {
+            attrs.title = data;
+        }
+        return attrs;
+    }
+}
+
+function Table($table) {
+    let cols, data, pageSize, totalRecords;
+    let $thead, $tbody;
 
     return {
         setColumns: _cols => cols = _cols,
@@ -67,16 +96,20 @@ window.Table = function($table) {
         setTotalRecords: _totalRecords => totalRecords = _totalRecords,
 
         render() {
-            let thead = THead(
-                    TR({class: 'stuff'}, cols.map(col => TH(col.title)))
-                ),
-                tbody = TBody(
-                    data.map(d => TR(cols.map(col => TD(d[col.key]))))
-                );
+            $thead = THead(TR(cols.map(col => TH(getCellAttrs(col), col.title))));
+            $tbody = TBody();
+            this.renderData();
+            $table.appendChild($thead);
+            $table.appendChild($tbody);
+        },
 
-            $table.appendChild(thead);
-            $table.appendChild(tbody);
+        renderData() {
+            removeChildren($tbody);
+            data.forEach(d => $tbody.appendChild(TR(cols.map(col => TD(getCellAttrs(col, d[col.key]), d[col.key])))));
         }
     }
 };
 
+Table.ColumnTypes = ColumnTypes;
+
+window.Table = Table;
