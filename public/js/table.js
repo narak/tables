@@ -24,8 +24,21 @@ function getCellAttrs(col, data) {
     }
 }
 
+function matchesFilter(filter, o) {
+    filter = filter.toLowerCase();
+
+    for (let k in o) {
+        if (o.hasOwnProperty(k)) {
+            let v = o[k];
+            if (v.toLowerCase().indexOf(filter) > -1) {
+                return true;
+            }
+        }
+    }
+}
+
 function Table($container) {
-    let cols, data, filter,
+    let cols, data, filter, filteredData,
         pageNum = 1, pageSize, totalRecords,
         $table, $thead, $tbody, $pager,
         firstRender = false;
@@ -34,6 +47,14 @@ function Table($container) {
         if (firstRender) {
             renderData();
         }
+    }
+
+    function getData() {
+        return filter ? filteredData : data;
+    }
+
+    function getTotalRecords() {
+        return filter ? filteredData.length : totalRecords;
     }
 
     function setColumns(_cols) {
@@ -57,6 +78,10 @@ function Table($container) {
     }
     function setFilter(_filter) {
         filter = _filter;
+        // Resets page num when filter is set.
+        pageNum = 1;
+
+        filteredData = data.filter(d => matchesFilter(filter, d));
         redraw();
     }
 
@@ -73,18 +98,19 @@ function Table($container) {
 
     function renderData() {
         let rows = [],
-            offset = (pageNum - 1) * pageSize,
-            limit = pageNum * pageSize;
+            _data = getData(),
+            _totalRecords = getTotalRecords(),
+            accessor = (pageNum - 1) * pageSize;
 
-        for (let i = offset; i < limit; i++) {
-            let d = data[i];
+        for (let i = 0; i < pageSize; i++, accessor++) {
+            let d = _data[accessor];
             if (!d) {
                 break;
             }
             rows.push(DOM.tr(cols.map(col => DOM.td(getCellAttrs(col, d[col.key]), d[col.key]))));
         }
 
-        let pageCount = Math.ceil(totalRecords / pageSize),
+        let pageCount = Math.ceil(_totalRecords / pageSize),
             $pages = [];
 
         for (let i = 1; i <= pageCount; i++) {
