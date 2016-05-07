@@ -83,6 +83,14 @@ window.Helpers = (function() {
         div(...args) {
             return this.Element('div', ...args);
         },
+
+        select(...args) {
+            return this.Element('select', ...args);
+        },
+
+        option(...args) {
+            return this.Element('option', ...args);
+        },
     };
 
     return {

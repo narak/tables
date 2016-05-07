@@ -89,8 +89,11 @@ function Table($container) {
         $thead = DOM.thead(DOM.tr(cols.map(col => DOM.th(getCellAttrs(col), [col.title, /*DOM.div(col.title)*/]))));
         $tbody = DOM.tbody();
         $table = DOM.table({'cellspacing': 0}, [$thead, $tbody]);
-        $pager = DOM.div({class: 'table-pager'});
+        $pager = DOM.select({class: 'table-pager'});
         DOM.appendChild($container, [DOM.div({class: 'table-scroll'}, $table), $pager]);
+
+
+        $pager.addEventListener('change', (e) => setPageNum(e.target.value));
 
         renderData();
         firstRender = true;
@@ -111,20 +114,18 @@ function Table($container) {
         }
 
         let pageCount = Math.ceil(_totalRecords / pageSize),
-            $pages = [];
+            $pageOpts = [];
 
         for (let i = 1; i <= pageCount; i++) {
             let cls = 'table-page-item';
             if (i === pageNum) {
                 cls += ' table-selected-page';
             }
-            let $el = DOM.div({class: cls}, i);
-            $pages.push($el);
-
-            $el.addEventListener('click', () => setPageNum(i));
+            let $el = DOM.option(i);
+            $pageOpts.push($el);
         }
         DOM.removeChildren($pager);
-        DOM.appendChild($pager, $pages);
+        DOM.appendChild($pager, $pageOpts);
 
 
         DOM.removeChildren($tbody);
