@@ -1,3 +1,34 @@
 table {
     margin: 30px;
 }
+
+td,
+th {
+    margin: 0;
+}
+
+th {
+    padding: 5px 10px;
+    white-space: nowrap;
+    text-align: left;
+}
+
+td {
+    padding: 5px 10px;
+    border-top: 1px solid #ccc;
+}
+
+tbody tr:hover {
+    background: #F9F9F9;
+}
+
+.table-cell-date {
+    white-space: nowrap;
+    max-width: 155px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.table-cell-number {
+    text-align: right;
+}
