@@ -56,5 +56,5 @@ document.querySelector('.per-page-count').addEventListener('change', e => {
 });
 
 document.querySelector('.search-field').addEventListener('change', e => {
-    table.search(e.target.value);
+    table.setFilter(e.target.value);
 });

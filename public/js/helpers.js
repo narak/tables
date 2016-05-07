@@ -13,18 +13,22 @@ window.Helpers = (function() {
     };
 
     const DOM = {
-        appendChild(dom, child) {
-            if (typeof child === 'string') {
-                child = document.createTextNode(child);
+        appendChild(dom, children) {
+
+            if (isArray(children)) {
+                children.forEach(child => DOM.appendChild(dom, child));
+            } else {
+                if (typeof children === 'string') {
+                    children = document.createTextNode(children);
+                }
+                dom.appendChild(children);
             }
-            dom.appendChild(child);
         },
 
         removeChildren(dom) {
             while (dom.firstChild) {
                 dom.removeChild(dom.firstChild);
             }
-            return dom;
         },
 
         Element(type, props, children) {
