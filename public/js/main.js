@@ -51,10 +51,6 @@ table.onFetch = (filters, callback) => {
         });
 }
 
-document.querySelector('.per-page-count').addEventListener('change', e => {
-    table.setPageSize(+e.target.value);
-});
-
 document.querySelector('.search-field').addEventListener('change', e => {
     table.setFilter(e.target.value);
 });

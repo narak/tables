@@ -42,7 +42,9 @@ window.Helpers = (function() {
 
             if (props) {
                 Object.keys(props).forEach(p => {
-                    dom.setAttribute(p, props[p]);
+                    if (props[p]) {
+                        dom.setAttribute(p, props[p]);
+                    }
                 });
             }
 

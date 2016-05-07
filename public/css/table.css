@@ -56,22 +56,3 @@ tbody tr:hover {
 .table-pager {
     margin: 5px 0;
 }
-
-.table-page-item {
-    display: inline-block;
-    width: 20px;
-    height: 20px;
-    box-shadow: 0 0 2px #888;
-    text-align: center;
-    line-height: 20px;
-    margin: 0 10px 0 0;
-    cursor: pointer;
-}
-
-.table-page-item:hover {
-    background: #f1f1f1;
-}
-
-.table-selected-page {
-    background: #ccc;
-}

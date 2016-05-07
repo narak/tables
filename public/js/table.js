@@ -40,7 +40,7 @@ function matchesFilter(filter, o) {
 function Table($container) {
     let cols, data, filter, filteredData,
         pageNum = 1, pageSize, totalRecords,
-        $table, $thead, $tbody, $pager,
+        $table, $thead, $tbody, $pagerBottom, $pagerTop,
         firstRender = false;
 
     function redraw() {
@@ -89,11 +89,21 @@ function Table($container) {
         $thead = DOM.thead(DOM.tr(cols.map(col => DOM.th(getCellAttrs(col), [col.title, /*DOM.div(col.title)*/]))));
         $tbody = DOM.tbody();
         $table = DOM.table({'cellspacing': 0}, [$thead, $tbody]);
-        $pager = DOM.select({class: 'table-pager'});
-        DOM.appendChild($container, [DOM.div({class: 'table-scroll'}, $table), $pager]);
+        $pagerTop = DOM.select({class: 'table-pager'});
+        $pagerBottom = DOM.select({class: 'table-pager'});
 
+        let $pageSelector = DOM.select({class: 'per-page-count'}, [
+            [10, 25, 50, 100].map(c => DOM.option({selected: pageSize === c}, c))
+        ]);
+        DOM.appendChild($container, [
+            DOM.div({class: 'per-page'}, ['Per Page: ', $pageSelector, ' Page: ', $pagerTop]),
+            DOM.div({class: 'table-scroll'}, $table),
+            'Page: ', $pagerBottom
+        ]);
 
-        $pager.addEventListener('change', (e) => setPageNum(e.target.value));
+        $pagerBottom.addEventListener('change', (e) => setPageNum(e.target.value));
+        $pagerTop.addEventListener('change', (e) => setPageNum(e.target.value));
+        $pageSelector.addEventListener('change', (e) => setPageSize(+e.target.value));
 
         renderData();
         firstRender = true;
@@ -124,8 +134,10 @@ function Table($container) {
             let $el = DOM.option(i);
             $pageOpts.push($el);
         }
-        DOM.removeChildren($pager);
-        DOM.appendChild($pager, $pageOpts);
+        DOM.removeChildren($pagerBottom);
+        DOM.removeChildren($pagerTop);
+        DOM.appendChild($pagerBottom, $pageOpts);
+        DOM.appendChild($pagerTop, $pageOpts.map(e => e.cloneNode(true)));
 
 
         DOM.removeChildren($tbody);
