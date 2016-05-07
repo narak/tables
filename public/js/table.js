@@ -40,8 +40,22 @@ function matchesFilter(filter, o) {
 function Table($container) {
     let cols, data, filter, filteredData,
         pageNum = 1, pageSize, totalRecords,
-        $table, $thead, $tbody, $pagerBottom, $pagerTop,
-        firstRender = false;
+        firstRender = false,
+        $el = {};
+
+    /**
+     * Careful when you use this. You don't want to add refs to elements that are going to be
+     * destroyed. Unless a mechanism for removing the element reference from this map is made,
+     * those elements won't get garbage collected.
+     */
+    function ref(key, dom) {
+        if (dom) {
+            $el[key] = dom;
+        } else {
+            dom = $el[key];
+        }
+        return dom;
+    }
 
     function redraw() {
         if (firstRender) {
@@ -86,23 +100,31 @@ function Table($container) {
     }
 
     function render() {
-        $thead = DOM.thead(DOM.tr(cols.map(col => DOM.th(getCellAttrs(col), [col.title, /*DOM.div(col.title)*/]))));
-        $tbody = DOM.tbody();
-        $table = DOM.table({'cellspacing': 0}, [$thead, $tbody]);
-        $pagerTop = DOM.select({class: 'table-pager'});
-        $pagerBottom = DOM.select({class: 'table-pager'});
+        let $thead = DOM.thead(
+                DOM.tr(cols.map(
+                    col => ref(`th:${col.title}`, DOM.th(getCellAttrs(col), [col.title]))
+                ))
+            ),
+            $table = DOM.table({'cellspacing': '0'}, [$thead, ref('tbody', DOM.tbody())]);
 
         let $pageSelector = DOM.select({class: 'per-page-count'}, [
             [10, 25, 50, 100].map(c => DOM.option({selected: pageSize === c}, c))
         ]);
+
         DOM.appendChild($container, [
-            DOM.div({class: 'per-page'}, ['Per Page: ', $pageSelector, ' Page: ', $pagerTop]),
+            DOM.div({class: 'per-page'}, [
+                'Per Page: ',
+                $pageSelector,
+                ' Page: ',
+                ref('pagerTop', DOM.select({class: 'table-pager'}))
+            ]),
             DOM.div({class: 'table-scroll'}, $table),
-            'Page: ', $pagerBottom
+            'Page: ',
+            ref('pagerBottom', DOM.select({class: 'table-pager'}))
         ]);
 
-        $pagerBottom.addEventListener('change', (e) => setPageNum(e.target.value));
-        $pagerTop.addEventListener('change', (e) => setPageNum(e.target.value));
+        ref('pagerBottom').addEventListener('change', (e) => setPageNum(e.target.value));
+        ref('pagerTop').addEventListener('change', (e) => setPageNum(e.target.value));
         $pageSelector.addEventListener('change', (e) => setPageSize(+e.target.value));
 
         renderData();
@@ -134,12 +156,17 @@ function Table($container) {
             let $el = DOM.option(i);
             $pageOpts.push($el);
         }
+
+        let $pagerBottom = ref('pagerBottom'),
+            $pagerTop = ref('pagerTop');
+
         DOM.removeChildren($pagerBottom);
         DOM.removeChildren($pagerTop);
         DOM.appendChild($pagerBottom, $pageOpts);
         DOM.appendChild($pagerTop, $pageOpts.map(e => e.cloneNode(true)));
 
 
+        let $tbody = ref('tbody');
         DOM.removeChildren($tbody);
         DOM.appendChild($tbody, rows);
     }

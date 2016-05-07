@@ -17,21 +17,12 @@ th {
 }
 
 th {
-    padding: 8px 10px;
+    padding: 8px 25px 8px 10px;
     white-space: nowrap;
     text-align: left;
     background: #f1f1f1;
     border: 1px solid #ccc;
 }
-/*th div {
-    position: absolute;
-    background: transparent;
-    padding: 9px 25px;
-    color: #2f2b2c;
-    top: 0;
-    margin-left: -25px;
-    line-height: normal;
-}*/
 
 td {
     padding: 5px 10px;
