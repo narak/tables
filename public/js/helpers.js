@@ -4,11 +4,11 @@ window.Helpers = (function() {
         return Object.prototype.toString.call(obj) === '[object Array]';
     }
 
-    function matchesFilter(filter, o) {
+    function matchesFilter(filter, o, allowedKeys) {
         filter = filter.toLowerCase();
 
         for (let k in o) {
-            if (o.hasOwnProperty(k)) {
+            if (o.hasOwnProperty(k) && allowedKeys[k]) {
                 let v = o[k];
                 if (v.toLowerCase().indexOf(filter) > -1) {
                     return true;

@@ -1,50 +1,55 @@
 /**
  * Improvements:
  * - Could add a react style event handling where event listeners are passed to the DOM helper
- * which can then setup automatic event delegation for better performance.
+ *   which can then setup automatic event delegation for better performance.
+ *
  * - Caching should probably be handled at the main layer instead of being implicitly done at
- * data fetch layer. This is causing some implicit behaviour for the prefetching logic.
+ *   data fetch layer. This is causing some implicit behaviour for the prefetching logic.
+
+ * - Table data cells should be reused to avoid DOM thrashing. Considering only the inner text
+ *   changes, the diffing should be trivial.
  */
 
 var table = Table(document.querySelector('.table-container'));
 
-table.setPageSize(10);
-table.setColumns([
-    {title: 'First Name', key: 'firstName'},
-    {title: 'Last Name', key: 'lastName'},
-    {title: 'City', key: 'city'},
-    {title: 'Zip Code', key: 'zipCode'},
-    {title: 'Country', key: 'country'},
-    {title: 'State', key: 'state'},
-    {title: 'User Name', key: 'userName'},
-    {title: 'Phone Number', key: 'phoneNumber'},
-    {title: 'Email', key: 'email'},
-    {title: 'Amount', key: 'amount', type: Table.ColumnTypes.number},
+const cols = [
+        {title: 'First Name', key: 'firstName'},
+        {title: 'Last Name', key: 'lastName'},
+        {title: 'City', key: 'city'},
+        {title: 'Zip Code', key: 'zipCode'},
+        {title: 'Country', key: 'country'},
+        {title: 'State', key: 'state'},
+        {title: 'User Name', key: 'userName'},
+        {title: 'Phone Number', key: 'phoneNumber'},
+        {title: 'Email', key: 'email'},
+        {title: 'Amount', key: 'amount', type: Table.ColumnTypes.number},
 
-    {title: 'Catch Phrase', key: 'catchPhrase'},
-    {title: 'Company Name', key: 'companyName'},
+        {title: 'Catch Phrase', key: 'catchPhrase'},
+        {title: 'Company Name', key: 'companyName'},
 
-    {title: 'Created Date', key: 'createdDate', type: Table.ColumnTypes.date},
-    {title: 'Modified Date', key: 'modifiedDate', type: Table.ColumnTypes.date},
+        {title: 'Created Date', key: 'createdDate', type: Table.ColumnTypes.date},
+        {title: 'Modified Date', key: 'modifiedDate', type: Table.ColumnTypes.date},
 
-    {title: 'Title', key: 'title'},
-    {title: 'Job Title', key: 'jobTitle'},
-    {title: 'Job Type', key: 'jobType'},
+        {title: 'Title', key: 'title'},
+        {title: 'Job Title', key: 'jobTitle'},
+        {title: 'Job Type', key: 'jobType'},
 
-    {title: 'Account', key: 'account'},
-    {title: 'Account Name', key: 'accountName'},
+        {title: 'Account', key: 'account'},
+        {title: 'Account Name', key: 'accountName'},
 
-    {title: 'IP', key: 'ip'},
-    {title: 'UserAgent', key: 'userAgent'},
-]);
-
-const
+        {title: 'IP', key: 'ip'},
+        {title: 'UserAgent', key: 'userAgent'},
+    ],
     MAX_ROWS = 100,
     prefetchSize = 100,
     defaultQuery = {pageSize: prefetchSize, offset: 0};
 
-var totalRecords;
+var colsMap = {},
+    totalRecords;
 
+cols.forEach(col => {
+    colsMap[col.key] = true;
+});
 
 function compare(sortOrder, a, b) {
     if (sortOrder === 'asc') {
@@ -54,7 +59,7 @@ function compare(sortOrder, a, b) {
     }
 }
 
-table.setDataSource((query, callback) => {
+function datasource(query, callback) {
     let pageEndIndex = query.offset + query.pageSize,
         hasAllRecords = (totalRecords && totalRecords <= prefetchSize),
         prefetch = hasAllRecords || (!query.filter && !query.sortBy && !query.sortOrder && pageEndIndex <= prefetchSize),
@@ -75,7 +80,7 @@ table.setDataSource((query, callback) => {
                 _totalRecords = d.totalRecords;
 
             if (query.filter) {
-                _data = _data.filter(_d => Helpers.matchesFilter(query.filter, _d));
+                _data = _data.filter(_d => Helpers.matchesFilter(query.filter, _d, colsMap));
                 _totalRecords = _data.length;
             }
 
@@ -87,12 +92,16 @@ table.setDataSource((query, callback) => {
             _data = _data.slice(query.offset, pageEndIndex);
             callback(_data, _totalRecords)
             totalRecords = d.totalRecords;
+
         } else {
             callback(d.rows, d.totalRecords);
         }
     });
-});
+}
 
+table.setPageSize(10);
+table.setColumns(cols);
+table.setDataSource(datasource);
 table.render();
 
 document.querySelector('.search-field').addEventListener('change', e => {
