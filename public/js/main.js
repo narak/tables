@@ -1,5 +1,6 @@
 var table = Table(document.querySelector('.table-container'));
 
+table.setPageSize(10);
 table.setColumns([
     {title: 'First Name', key: 'firstName'},
     {title: 'Last Name', key: 'lastName'},
@@ -29,27 +30,33 @@ table.setColumns([
     {title: 'UserAgent', key: 'userAgent'},
 ]);
 
-const MAX_ROWS = 99;
-fetch(`/data/${MAX_ROWS}/`, { params: {abc: 'zys'}})
-    .then(res => res.json())
-    .then(d => {
-        table.setData(d.rows);
-        table.setTotalRecords(d.totalRecords);
-        table.setPageSize(10);
-        table.render();
-        document.getElementById('loading').remove();
+const
+    MAX_ROWS = 200,
+    prefetchSize = 100,
+    defaultQuery = {pageSize: prefetchSize, offset: 0};
+
+//filteredData = data.filter(d => matchesFilter(filter, d));
+
+table.setDataSource((query, callback) => {
+    let pageEndIndex = query.offset + query.pageSize,
+        prefetch = !query.filter && !query.sortBy && !query.sortOrder && pageEndIndex <= prefetchSize,
+        _query = query;
+
+    if (prefetch) {
+        _query = Object.assign({}, query, defaultQuery);
+    }
+
+    Helpers.getJSON(`/data/${MAX_ROWS}`, _query, d => {
+        if (prefetch) {
+            let _data = d.rows.slice(query.offset, pageEndIndex);
+            callback(_data, d.totalRecords)
+        } else {
+            callback(d.rows, d.totalRecords);
+        }
     });
+});
 
-
-// This event occurs only if Table recognizes that the total records is greater than
-// the data it already has.
-table.onFetch = (filters, callback) => {
-    fetch(`/data/${MAX_ROWS}/?${Helpers.QueryString.stringify(filters)}`)
-        .then(res => res.json())
-        .then(d => {
-            callback(d.rows);
-        });
-}
+table.render();
 
 document.querySelector('.search-field').addEventListener('change', e => {
     table.setFilter(e.target.value);

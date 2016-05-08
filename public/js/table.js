@@ -24,22 +24,10 @@ function getCellAttrs(col, data) {
     }
 }
 
-function matchesFilter(filter, o) {
-    filter = filter.toLowerCase();
-
-    for (let k in o) {
-        if (o.hasOwnProperty(k)) {
-            let v = o[k];
-            if (v.toLowerCase().indexOf(filter) > -1) {
-                return true;
-            }
-        }
-    }
-}
-
 function Table($container) {
-    let cols, data, filter, filteredData,
-        pageNum = 1, pageSize, totalRecords,
+    let cols, data, filter,
+        pageNum = 1, sortBy, sortOrder, pageSize,
+        datasource,
         firstRender = false,
         $el = {};
 
@@ -63,14 +51,22 @@ function Table($container) {
         }
     }
 
-    function getData() {
-        return filter ? filteredData : data;
+    function getData(cb) {
+        if (datasource) {
+            datasource({
+                offset: (pageNum - 1) * pageSize,
+                pageSize, filter, sortBy, sortOrder
+            }, cb);
+        } else {
+            cb([], 0);
+        }
     }
 
-    function getTotalRecords() {
-        return filter ? filteredData.length : totalRecords;
+    function setDataSource(_datasource) {
+        datasource = _datasource;
+        pageNum = 1;
+        redraw();
     }
-
     function setColumns(_cols) {
         cols = _cols;
         redraw();
@@ -80,11 +76,11 @@ function Table($container) {
         redraw();
     }
     function setPageSize(_pageSize) {
-        pageSize = _pageSize;
+        pageSize = +_pageSize;
         redraw();
     }
     function setPageNum(_pageNum) {
-        pageNum = _pageNum;
+        pageNum = +_pageNum;
         redraw();
     }
     function setTotalRecords(_totalRecords) {
@@ -94,8 +90,6 @@ function Table($container) {
         filter = _filter;
         // Resets page num when filter is set.
         pageNum = 1;
-
-        filteredData = data.filter(d => matchesFilter(filter, d));
         redraw();
     }
 
@@ -116,7 +110,8 @@ function Table($container) {
         ]);
 
         DOM.appendChild($container, [
-            DOM.div({class: 'per-page'}, [
+            ref('loading', DOM.div({class: 'table-loading'}, ['Loading...'])),
+            DOM.div([
                 'Per Page: ',
                 $pageSelector,
                 ' Page: ',
@@ -129,55 +124,51 @@ function Table($container) {
 
         ref('pagerBottom').addEventListener('change', (e) => setPageNum(e.target.value));
         ref('pagerTop').addEventListener('change', (e) => setPageNum(e.target.value));
-        $pageSelector.addEventListener('change', (e) => setPageSize(+e.target.value));
+        $pageSelector.addEventListener('change', (e) => setPageSize(e.target.value));
 
         renderData();
         firstRender = true;
     }
 
     function renderData() {
-        let rows = [],
-            _data = getData(),
-            _totalRecords = getTotalRecords(),
-            accessor = (pageNum - 1) * pageSize;
-
-        for (let i = 0; i < pageSize; i++, accessor++) {
-            let d = _data[accessor];
-            if (!d) {
-                break;
+        ref('loading').classList.remove('table-loading-hide');
+        getData((_data, _totalRecords) => {
+            let rows = [];
+            for (let i = 0; i < pageSize; i++) {
+                let d = _data[i];
+                if (!d) {
+                    break;
+                }
+                rows.push(DOM.tr(cols.map(col => DOM.td(getCellAttrs(col, d[col.key]), d[col.key]))));
             }
-            rows.push(DOM.tr(cols.map(col => DOM.td(getCellAttrs(col, d[col.key]), d[col.key]))));
-        }
 
-        let pageCount = Math.ceil(_totalRecords / pageSize),
-            $pageOpts = [];
+            let pageCount = Math.ceil(_totalRecords / pageSize),
+                $pageOpts = [];
 
-        for (let i = 1; i <= pageCount; i++) {
-            let cls = 'table-page-item';
-            if (i === pageNum) {
-                cls += ' table-selected-page';
+            for (let i = 1; i <= pageCount; i++) {
+                $pageOpts.push(DOM.option({selected: i === pageNum}, i));
             }
-            let $el = DOM.option(i);
-            $pageOpts.push($el);
-        }
 
-        let $pagerBottom = ref('pagerBottom'),
-            $pagerTop = ref('pagerTop');
+            let $pagerBottom = ref('pagerBottom'),
+                $pagerTop = ref('pagerTop');
 
-        DOM.removeChildren($pagerBottom);
-        DOM.removeChildren($pagerTop);
-        DOM.appendChild($pagerBottom, $pageOpts);
-        DOM.appendChild($pagerTop, $pageOpts.map(e => e.cloneNode(true)));
+            DOM.removeChildren($pagerBottom);
+            DOM.removeChildren($pagerTop);
+            DOM.appendChild($pagerBottom, $pageOpts);
+            DOM.appendChild($pagerTop, $pageOpts.map(e => e.cloneNode(true)));
 
 
-        let $tbody = ref('tbody');
-        DOM.removeChildren($tbody);
-        DOM.appendChild($tbody, rows);
+            let $tbody = ref('tbody');
+            DOM.removeChildren($tbody);
+            DOM.appendChild($tbody, rows);
+            ref('loading').classList.add('table-loading-hide');
+        });
     }
 
     return {
         setColumns,
         setData,
+        setDataSource,
         setPageSize,
         setTotalRecords,
         setFilter,

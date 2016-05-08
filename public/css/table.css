@@ -1,7 +1,7 @@
 .table-container {
     width: calc(100% - 60px);
     margin: 30px;
-    /*position: fixed;*/
+    position: relative;
     height: calc(100% - 60px);
 }
 
@@ -69,4 +69,22 @@ tbody tr:hover {
 
 .table-pager {
     margin: 5px 0;
+}
+
+.table-loading {
+    position: absolute;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    top: 2px;
+    color: #fff;
+    text-align: center;
+    line-height: 24px;
+    transition: opacity .3s;
+    opacity: 1;
+    visibility: visible;
+}
+
+.table-loading-hide {
+    opacity: 0;
+    visibility: hidden;
 }

@@ -4,11 +4,25 @@ window.Helpers = (function() {
         return Object.prototype.toString.call(obj) === '[object Array]';
     }
 
+    function matchesFilter(filter, o) {
+        filter = filter.toLowerCase();
+
+        for (let k in o) {
+            if (o.hasOwnProperty(k)) {
+                let v = o[k];
+                if (v.toLowerCase().indexOf(filter) > -1) {
+                    return true;
+                }
+            }
+        }
+    }
+
     const QueryString = {
         stringify(query) {
             return Object.keys(query)
-               .map(key => encodeURIComponent(key) + "=" + encodeURIComponent(query[key]))
-               .join("&");
+                .filter(key => query[key] !== undefined)
+                .map(key => encodeURIComponent(key) + "=" + encodeURIComponent(query[key]))
+                .join("&");
         }
     };
 
@@ -95,9 +109,33 @@ window.Helpers = (function() {
         },
     };
 
+    let cache = {},
+        cacheTTL = 60000;
+
+    function getJSON(url, params, cb) {
+        let _url = `${url}?${QueryString.stringify(params)}`,
+            _cache = cache[_url];
+
+        if (_cache && Date.now() - _cache.timestamp < cacheTTL) {
+            cb(_cache.data);
+        } else {
+            fetch(_url)
+                .then(res => res.json())
+                .then(d => {
+                    cache[_url] = {
+                        data: d,
+                        timestamp: Date.now()
+                    };
+                    cb(d);
+                });
+        }
+    }
+
     return {
         isArray,
+        matchesFilter,
         DOM,
-        QueryString
+        QueryString,
+        getJSON
     };
 })();

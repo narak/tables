@@ -5,7 +5,7 @@ const
     compression = require('compression'),
     app = express(),
     data = {
-        99: require('./data/data99.js'),
+        100: require('./data/data100.js'),
         200: require('./data/data200.js'),
         500: require('./data/data500.js')
     };
@@ -15,13 +15,18 @@ app.use(compression());
 app.listen(3000);
 
 app.get('/data/:maxRows', function(req, res) {
-    let _data = data[req.params.maxRows];
+    let _data = data[req.params.maxRows],
+        offset = req.query.offset,
+        pageSize = req.query.pageSize;
+
+    if (offset && pageSize) {
+        _data = _data.slice(offset, offset + pageSize);
+    }
 
     res.header('Content-Type', 'application/json');
     res.end(JSON.stringify({
-        rows: data[req.params.maxRows],
-        totalRecords: _data.length,
-        limit: _data.length
+        rows: _data,
+        totalRecords: data[req.params.maxRows].length
     }));
 });
 
