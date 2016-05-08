@@ -77,6 +77,7 @@ function Table($container) {
     }
     function setPageSize(_pageSize) {
         pageSize = +_pageSize;
+        pageNum = 1;
         redraw();
     }
     function setPageNum(_pageNum) {
