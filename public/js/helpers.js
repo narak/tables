@@ -27,6 +27,17 @@ window.Helpers = (function() {
     };
 
     const DOM = {
+        isAncestorOf(ancestor, child) {
+            var element = child.parentNode;
+            while (element) {
+                if (element === ancestor) {
+                    return true;
+                }
+                element = element.parentNode;
+            }
+            return false;
+        },
+
         appendChild(dom, children) {
 
             if (isArray(children)) {
@@ -69,39 +80,51 @@ window.Helpers = (function() {
         },
 
         table(...args) {
-            return this.Element('table', ...args);
+            return DOM.Element('table', ...args);
         },
 
         thead(...args) {
-            return this.Element('thead', ...args);
+            return DOM.Element('thead', ...args);
         },
 
         tbody(...args) {
-            return this.Element('tbody', ...args);
+            return DOM.Element('tbody', ...args);
         },
 
         tr(...args) {
-            return this.Element('tr', ...args);
+            return DOM.Element('tr', ...args);
         },
 
         th(...args) {
-            return this.Element('th', ...args);
+            return DOM.Element('th', ...args);
         },
 
         td(...args) {
-            return this.Element('td', ...args);
+            return DOM.Element('td', ...args);
         },
 
         div(...args) {
-            return this.Element('div', ...args);
+            return DOM.Element('div', ...args);
         },
 
         select(...args) {
-            return this.Element('select', ...args);
+            return DOM.Element('select', ...args);
         },
 
         option(...args) {
-            return this.Element('option', ...args);
+            return DOM.Element('option', ...args);
+        },
+
+        button(...args) {
+            return DOM.Element('button', ...args);
+        },
+
+        ul(...args) {
+            return DOM.Element('ul', ...args);
+        },
+
+        li(...args) {
+            return DOM.Element('li', ...args);
         },
 
         text(str) {

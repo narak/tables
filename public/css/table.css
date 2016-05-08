@@ -115,3 +115,50 @@ tbody tr:hover {
     font-size: 11px;
     font-weight: 600;
 }
+
+.table-column-visibility {
+    display: inline-block;
+    margin-left: 5px;
+}
+
+.table-column-visibility ul,
+.table-column-visibility li {
+    list-style: none;
+    margin: 0;
+}
+
+.table-column-visibility ul {
+    display: none;
+    position: absolute;
+    z-index: 1;
+    background: #fff;
+    box-shadow: 1px 1px 4px #888;
+    padding: 0;
+}
+
+.table-column-menu-show ul {
+    display: inline-block;
+}
+
+.table-column-visibility li {
+    padding: 3px 7px;
+}
+
+.table-column-visibility li:hover {
+    cursor: pointer;
+    background: #f1f1f1;
+}
+
+.table-col-tick {
+    display: inline-block;
+    width: 15px;
+    height: 17px;
+}
+
+.table-col-tick-hide {
+    visibility: hidden;
+}
+
+.table-cell-hidden {
+    display: none;
+}

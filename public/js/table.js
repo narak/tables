@@ -12,24 +12,39 @@ const TypeClassMap = {
     [ColumnTypes.date]: 'table-cell-date'
 };
 
-function getCellAttrs(col, data) {
+function getCellAttrs(col, data, hidden) {
+    let attrs = {},
+        _class = '';
+
     if (col.type) {
-        let attrs = {
-            class: TypeClassMap[col.type]
-        };
+        _class += TypeClassMap[col.type];
+
         if (data) {
             attrs.title = data;
         }
-        return attrs;
     }
+
+    if (hidden) {
+        _class += ' table-cell-hidden';
+    }
+
+    if (_class) {
+        attrs.class = _class;
+    }
+
+    return attrs;
 }
 
 function Table($container) {
     let cols, data, filter,
-        pageNum = 1, sortBy, sortOrder, pageSize,
+        sortBy, sortOrder, pageSize,
         datasource,
+        pageNum = 1,
+        hiddenCols = {},
         firstRender = false,
         $el = {};
+
+    let { table, thead, tbody, tr, th, td, div, select, option, button, text, ul, li } = DOM;
 
     /**
      * Careful when you use this. You don't want to add refs to elements that are going to be
@@ -124,36 +139,47 @@ function Table($container) {
     }
 
     function render() {
-        let $thead = DOM.thead(
-                DOM.tr(cols.map(
-                    col => ref(`th:${col.key}`, DOM.th(getCellAttrs(col), [
+        let $thead = thead(
+                tr(cols.map(
+                    col => ref(`th:${col.key}`, th(getCellAttrs(col), [
                         col.title,
-                        DOM.div({class: 'sort-asc-arrow'}),
-                        DOM.div({class: 'sort-desc-arrow'})
+                        div({class: 'sort-asc-arrow'}),
+                        div({class: 'sort-desc-arrow'})
                     ]))
                 ))
             ),
-            $table = DOM.table({'cellspacing': '0'}, [$thead, ref('tbody', DOM.tbody())]);
+            $table = table({'width': '100%', 'cellspacing': '0'}, [$thead, ref('tbody', tbody())]);
 
-        let $pageSelector = DOM.select({class: 'per-page-count'}, [
-            [10, 25, 50, 100].map(c => DOM.option({selected: pageSize === c}, c))
+        let $pageSelector = select({class: 'per-page-count'}, [
+            [10, 25, 50, 100].map(c => option({selected: pageSize === c}, c))
         ]);
 
+        const tickUnicode = '\u2713';
+
         DOM.appendChild($container, [
-            ref('loading', DOM.div({class: 'table-loading'}, ['Loading...'])),
-            DOM.div({class: 'table-total-records'}, [
+            ref('loading', div({class: 'table-loading'}, ['Loading...'])),
+            div({class: 'table-total-records'}, [
                 'Total Records: ',
-                ref('totalRecords', DOM.text('0'))
+                ref('totalRecords', text('0'))
             ]),
-            DOM.div([
+            div([
                 'Per Page: ',
                 $pageSelector,
                 ' Page: ',
-                ref('pagerTop', DOM.select({class: 'table-pager'}))
+                ref('pagerTop', select({class: 'table-pager'})),
+                ref('colVisCont', div({class: 'table-column-visibility'}, [
+                    ref('colVisBtn', button({type: 'button'}, 'columns')),
+                    ul({class: 'table-column-menu'},
+                        cols.map(col => ref(`colVis:${col.key}`, li([
+                            ref(`colVisTick:${col.key}`, div({class: 'table-col-tick'}, tickUnicode)),
+                            col.title
+                        ])))
+                    ),
+                ])),
             ]),
-            DOM.div({class: 'table-scroll'}, $table),
+            div({class: 'table-scroll'}, $table),
             'Page: ',
-            ref('pagerBottom', DOM.select({class: 'table-pager'}))
+            ref('pagerBottom', select({class: 'table-pager'})),
         ]);
 
         ref('pagerBottom').addEventListener('change', (e) => setPageNum(e.target.value));
@@ -162,6 +188,42 @@ function Table($container) {
 
         cols.forEach(col => {
             ref(`th:${col.key}`).addEventListener('click', setSortBy.bind(this, col.key));
+        });
+
+        let $colVisCont = ref('colVisCont'),
+            showMenuClass = 'table-column-menu-show',
+            hideCellClass = 'table-cell-hidden',
+            hideTickClass = 'table-col-tick-hide';
+
+        ref('colVisBtn').addEventListener('click', () => {
+            if ($colVisCont.classList.contains(showMenuClass)) {
+                $colVisCont.classList.remove(showMenuClass);
+            } else {
+                $colVisCont.classList.add(showMenuClass);
+            }
+        });
+
+        window.addEventListener('click', (e) => {
+            if (!DOM.isAncestorOf($colVisCont, e.target)) {
+                $colVisCont.classList.remove(showMenuClass);
+            }
+        });
+
+        cols.forEach(col => {
+            ref(`colVis:${col.key}`).addEventListener('click', () => {
+                let hidden = !hiddenCols[col.key];
+                hiddenCols[col.key] = hidden;
+
+                if (hidden) {
+                    ref(`th:${col.key}`).classList.add(hideCellClass);
+                    ref(`colVisTick:${col.key}`).classList.add(hideTickClass);
+                } else {
+                    ref(`th:${col.key}`).classList.remove(hideCellClass);
+                    ref(`colVisTick:${col.key}`).classList.remove(hideTickClass);
+                }
+
+                redraw();
+            });
         });
 
         renderData();
@@ -177,14 +239,15 @@ function Table($container) {
                 if (!d) {
                     break;
                 }
-                rows.push(DOM.tr(cols.map(col => DOM.td(getCellAttrs(col, d[col.key]), d[col.key]))));
+                hiddenCols
+                rows.push(tr(cols.map(col => td(getCellAttrs(col, d[col.key], hiddenCols[col.key]), d[col.key]))));
             }
 
             let pageCount = Math.ceil(_totalRecords / pageSize),
                 $pageOpts = [];
 
             for (let i = 1; i <= pageCount; i++) {
-                $pageOpts.push(DOM.option({selected: i === pageNum}, i));
+                $pageOpts.push(option({selected: i === pageNum}, i));
             }
 
             ref('totalRecords').textContent = _totalRecords;
