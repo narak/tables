@@ -25,6 +25,11 @@ th {
     border: 1px solid #ccc;
 }
 
+th:hover {
+    text-decoration: underline;
+    cursor: pointer;
+}
+
 .sort-asc-arrow {
     position: absolute;
     right: 8px;
@@ -45,6 +50,17 @@ th {
     border-bottom: 0;
     border-left: 4px solid transparent;
     border-right: 4px solid transparent;
+}
+
+.table-sorting-asc .sort-desc-arrow {
+    display: none;
+}
+.table-sorting-desc .sort-asc-arrow {
+    display: none;
+}
+.table-sorting-desc .sort-desc-arrow,
+.table-sorting-asc .sort-asc-arrow {
+    top: 14px;
 }
 
 td {

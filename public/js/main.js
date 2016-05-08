@@ -1,3 +1,11 @@
+/**
+ * Improvements:
+ * - Could add a react style event handling where event listeners are passed to the DOM helper
+ * which can then setup automatic event delegation for better performance.
+ * - Caching should probably be handled at the main layer instead of being implicitly done at
+ * data fetch layer. This is causing some implicit behaviour for the prefetching logic.
+ */
+
 var table = Table(document.querySelector('.table-container'));
 
 table.setPageSize(10);
@@ -47,6 +55,8 @@ table.setDataSource((query, callback) => {
         _query = Object.assign({}, query, defaultQuery);
         if (hasAllRecords) {
             _query.filter = undefined;
+            _query.sortBy = undefined;
+            _query.sortOrder = undefined;
         }
     }
 

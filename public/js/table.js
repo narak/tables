@@ -94,10 +94,39 @@ function Table($container) {
         redraw();
     }
 
+    function setSortBy(key) {
+        let $currTh = ref(`th:${key}`),
+            $prevTh = ref(`th:${sortBy}`);
+
+        if (sortBy === key) {
+            if (sortOrder === 'desc') {
+                sortOrder = 'asc';
+                $currTh.classList.remove('table-sorting-desc');
+                $currTh.classList.add('table-sorting-asc');
+
+            } else {
+                sortOrder = 'desc';
+                $currTh.classList.remove('table-sorting-asc');
+                $currTh.classList.add('table-sorting-desc');
+            }
+        } else {
+            if ($prevTh) {
+                $prevTh.classList.remove(`table-sorting-${sortOrder}`);
+            }
+            $currTh.classList.add('table-sorting-asc');
+
+            sortBy = key;
+            sortOrder = 'asc';
+        }
+
+        pageNum = 1;
+        redraw();
+    }
+
     function render() {
         let $thead = DOM.thead(
                 DOM.tr(cols.map(
-                    col => ref(`th:${col.title}`, DOM.th(getCellAttrs(col), [
+                    col => ref(`th:${col.key}`, DOM.th(getCellAttrs(col), [
                         col.title,
                         DOM.div({class: 'sort-asc-arrow'}),
                         DOM.div({class: 'sort-desc-arrow'})
@@ -126,6 +155,10 @@ function Table($container) {
         ref('pagerBottom').addEventListener('change', (e) => setPageNum(e.target.value));
         ref('pagerTop').addEventListener('change', (e) => setPageNum(e.target.value));
         $pageSelector.addEventListener('change', (e) => setPageSize(e.target.value));
+
+        cols.forEach(col => {
+            ref(`th:${col.key}`).addEventListener('click', setSortBy.bind(this, col.key));
+        });
 
         renderData();
         firstRender = true;
@@ -173,6 +206,7 @@ function Table($container) {
         setPageSize,
         setTotalRecords,
         setFilter,
+        setSortBy,
         setPageNum,
         render,
         renderData
