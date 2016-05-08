@@ -27,16 +27,32 @@ app.use(express.static(__dirname + '/public'));
 app.use(compression());
 app.listen(3000);
 
+
+function compare(sortOrder, a, b) {
+    if (sortOrder === 'asc') {
+        return a < b;
+    } else {
+        return a > b;
+    }
+}
+
 app.get('/data/:maxRows', function(req, res) {
     let _data = data[req.params.maxRows],
         totalRecords = _data.length,
         offset = req.query.offset,
         pageSize = req.query.pageSize,
-        filter = req.query.filter;
+        filter = req.query.filter,
+        sortBy = req.query.sortBy,
+        sortOrder = req.query.sortOrder;
 
     if (filter) {
         _data = _data.filter(_d => matchesFilter(filter, _d));
         totalRecords = _data.length;
+    }
+
+    // todo: loop only once to filter and sort.
+    if (sortBy) {
+        _data = _data.sort((a, b) => compare(sortOrder, a[sortBy], b[sortBy]) ? -1 : 1);
     }
 
     if (offset && pageSize) {

@@ -39,11 +39,20 @@ table.setColumns([
 ]);
 
 const
-    MAX_ROWS = 200,
+    MAX_ROWS = 100,
     prefetchSize = 100,
     defaultQuery = {pageSize: prefetchSize, offset: 0};
 
 var totalRecords;
+
+
+function compare(sortOrder, a, b) {
+    if (sortOrder === 'asc') {
+        return a < b;
+    } else {
+        return a > b;
+    }
+}
 
 table.setDataSource((query, callback) => {
     let pageEndIndex = query.offset + query.pageSize,
@@ -65,6 +74,11 @@ table.setDataSource((query, callback) => {
             let _data = d.rows;
             if (query.filter) {
                 _data = _data.filter(_d => Helpers.matchesFilter(query.filter, _d));
+            }
+
+            // todo: loop only once to filter and sort.
+            if (query.sortBy) {
+                _data = _data.sort((a, b) => compare(query.sortOrder, a[query.sortBy], b[query.sortBy]) ? -1 : 1);
             }
 
             _data = _data.slice(query.offset, pageEndIndex);
