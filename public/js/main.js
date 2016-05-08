@@ -31,25 +31,35 @@ table.setColumns([
 ]);
 
 const
-    MAX_ROWS = 200,
+    MAX_ROWS = 100,
     prefetchSize = 100,
     defaultQuery = {pageSize: prefetchSize, offset: 0};
 
-//filteredData = data.filter(d => matchesFilter(filter, d));
+var totalRecords;
 
 table.setDataSource((query, callback) => {
     let pageEndIndex = query.offset + query.pageSize,
-        prefetch = !query.filter && !query.sortBy && !query.sortOrder && pageEndIndex <= prefetchSize,
+        hasAllRecords = (totalRecords && totalRecords <= prefetchSize),
+        prefetch = hasAllRecords || (!query.filter && !query.sortBy && !query.sortOrder && pageEndIndex <= prefetchSize),
         _query = query;
 
     if (prefetch) {
         _query = Object.assign({}, query, defaultQuery);
+        if (hasAllRecords) {
+            _query.filter = undefined;
+        }
     }
 
     Helpers.getJSON(`/data/${MAX_ROWS}`, _query, d => {
         if (prefetch) {
-            let _data = d.rows.slice(query.offset, pageEndIndex);
+            let _data = d.rows;
+            if (query.filter) {
+                _data = _data.filter(_d => Helpers.matchesFilter(query.filter, _d));
+            }
+
+            _data = _data.slice(query.offset, pageEndIndex);
             callback(_data, d.totalRecords)
+            totalRecords = d.totalRecords;
         } else {
             callback(d.rows, d.totalRecords);
         }
