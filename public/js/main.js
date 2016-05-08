@@ -71,9 +71,12 @@ table.setDataSource((query, callback) => {
 
     Helpers.getJSON(`/data/${MAX_ROWS}`, _query, d => {
         if (prefetch) {
-            let _data = d.rows;
+            let _data = d.rows,
+                _totalRecords = d.totalRecords;
+
             if (query.filter) {
                 _data = _data.filter(_d => Helpers.matchesFilter(query.filter, _d));
+                _totalRecords = _data.length;
             }
 
             // todo: loop only once to filter and sort.
@@ -82,7 +85,7 @@ table.setDataSource((query, callback) => {
             }
 
             _data = _data.slice(query.offset, pageEndIndex);
-            callback(_data, d.totalRecords)
+            callback(_data, _totalRecords)
             totalRecords = d.totalRecords;
         } else {
             callback(d.rows, d.totalRecords);

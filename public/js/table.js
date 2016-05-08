@@ -141,6 +141,10 @@ function Table($container) {
 
         DOM.appendChild($container, [
             ref('loading', DOM.div({class: 'table-loading'}, ['Loading...'])),
+            DOM.div({class: 'table-total-records'}, [
+                'Total Records: ',
+                ref('totalRecords', DOM.text('0'))
+            ]),
             DOM.div([
                 'Per Page: ',
                 $pageSelector,
@@ -183,6 +187,7 @@ function Table($container) {
                 $pageOpts.push(DOM.option({selected: i === pageNum}, i));
             }
 
+            ref('totalRecords').textContent = _totalRecords;
             let $pagerBottom = ref('pagerBottom'),
                 $pagerTop = ref('pagerTop');
 

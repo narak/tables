@@ -33,7 +33,7 @@ window.Helpers = (function() {
                 children.forEach(child => DOM.appendChild(dom, child));
             } else {
                 if (typeof children === 'string' || typeof children === 'number') {
-                    children = document.createTextNode(children);
+                    children = this.text(children);
                 }
                 dom.appendChild(children);
             }
@@ -62,11 +62,7 @@ window.Helpers = (function() {
                 });
             }
 
-            if (isArray(children)) {
-                children.forEach(child => {
-                    DOM.appendChild(dom, child);
-                });
-            } else if (children) {
+            if (children) {
                 DOM.appendChild(dom, children);
             }
             return dom;
@@ -106,6 +102,10 @@ window.Helpers = (function() {
 
         option(...args) {
             return this.Element('option', ...args);
+        },
+
+        text(str) {
+            return document.createTextNode(str);
         },
     };
 
