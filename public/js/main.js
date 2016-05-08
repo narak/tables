@@ -31,7 +31,7 @@ table.setColumns([
 ]);
 
 const
-    MAX_ROWS = 100,
+    MAX_ROWS = 200,
     prefetchSize = 100,
     defaultQuery = {pageSize: prefetchSize, offset: 0};
 
