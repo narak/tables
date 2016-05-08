@@ -13,32 +13,32 @@
 var table = Table(document.querySelector('.table-container'));
 
 const cols = [
+        {title: 'User Name', key: 'userName'},
         {title: 'First Name', key: 'firstName'},
         {title: 'Last Name', key: 'lastName'},
         {title: 'City', key: 'city'},
-        {title: 'Zip Code', key: 'zipCode'},
-        {title: 'Country', key: 'country'},
-        {title: 'State', key: 'state'},
-        {title: 'User Name', key: 'userName'},
+        {title: 'Zip Code', key: 'zipCode', hidden: true},
+        {title: 'Country', key: 'country', hidden: true},
+        {title: 'State', key: 'state', hidden: true},
         {title: 'Phone Number', key: 'phoneNumber'},
         {title: 'Email', key: 'email'},
-        {title: 'Amount', key: 'amount', type: Table.ColumnTypes.number},
+        {title: 'Amount', key: 'amount', type: Table.ColumnTypes.number, hidden: true},
 
-        {title: 'Catch Phrase', key: 'catchPhrase'},
+        {title: 'Catch Phrase', key: 'catchPhrase', hidden: true},
         {title: 'Company Name', key: 'companyName'},
 
         {title: 'Created Date', key: 'createdDate', type: Table.ColumnTypes.date},
-        {title: 'Modified Date', key: 'modifiedDate', type: Table.ColumnTypes.date},
+        {title: 'Modified Date', key: 'modifiedDate', type: Table.ColumnTypes.date, hidden: true},
 
-        {title: 'Title', key: 'title'},
-        {title: 'Job Title', key: 'jobTitle'},
-        {title: 'Job Type', key: 'jobType'},
+        {title: 'Title', key: 'title', hidden: true},
+        {title: 'Job Title', key: 'jobTitle', hidden: true},
+        {title: 'Job Type', key: 'jobType', hidden: true},
 
-        {title: 'Account', key: 'account'},
-        {title: 'Account Name', key: 'accountName'},
+        {title: 'Account', key: 'account', hidden: true},
+        {title: 'Account Name', key: 'accountName', hidden: true},
 
         {title: 'IP', key: 'ip'},
-        {title: 'UserAgent', key: 'userAgent'},
+        {title: 'UserAgent', key: 'userAgent', hidden: true},
     ],
     MAX_ROWS = 100,
     prefetchSize = 100,
@@ -99,7 +99,7 @@ function datasource(query, callback) {
     });
 }
 
-table.setPageSize(10);
+table.setPageSize(25);
 table.setColumns(cols);
 table.setDataSource(datasource);
 table.render();

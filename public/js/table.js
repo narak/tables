@@ -84,6 +84,13 @@ function Table($container) {
     }
     function setColumns(_cols) {
         cols = _cols;
+
+        cols.forEach(col => {
+            if (col.hidden) {
+                hiddenCols[col.key] = true;
+            }
+        });
+
         redraw();
     }
     function setData(_data) {
@@ -141,7 +148,7 @@ function Table($container) {
     function render() {
         let $thead = thead(
                 tr(cols.map(
-                    col => ref(`th:${col.key}`, th(getCellAttrs(col), [
+                    col => ref(`th:${col.key}`, th(getCellAttrs(col, null, hiddenCols[col.key]), [
                         col.title,
                         div({class: 'sort-asc-arrow'}),
                         div({class: 'sort-desc-arrow'})
@@ -171,7 +178,7 @@ function Table($container) {
                     ref('colVisBtn', button({type: 'button'}, 'columns')),
                     ul({class: 'table-column-menu'},
                         cols.map(col => ref(`colVis:${col.key}`, li([
-                            ref(`colVisTick:${col.key}`, div({class: 'table-col-tick'}, tickUnicode)),
+                            ref(`colVisTick:${col.key}`, div({class: 'table-col-tick ' + (hiddenCols[col.key] ? 'table-col-tick-hide' : '')}, tickUnicode)),
                             col.title
                         ])))
                     ),
