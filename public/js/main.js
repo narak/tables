@@ -40,7 +40,10 @@ const cols = [
         {title: 'IP', key: 'ip'},
         {title: 'UserAgent', key: 'userAgent', hidden: true},
     ],
-    MAX_ROWS = 100,
+    queryParams = Helpers.QueryString.parse(window.location.search),
+    MAX_ROWS = queryParams.maxRows && [100, 200, 500].indexOf(+queryParams.maxRows) > -1 ?
+        queryParams.maxRows :
+        100,
     prefetchSize = 100,
     defaultQuery = {pageSize: prefetchSize, offset: 0};
 

@@ -23,6 +23,14 @@ window.Helpers = (function() {
                 .filter(key => query[key] !== undefined)
                 .map(key => encodeURIComponent(key) + "=" + encodeURIComponent(query[key]))
                 .join("&");
+        },
+
+        parse(url) {
+            let bits = url.split('?')[1].split('&').map(u => u.split('=')),
+                params = {};
+
+            bits.forEach(b => params[decodeURIComponent(b[0])] = decodeURIComponent(b[1]));
+            return params;
         }
     };
 
