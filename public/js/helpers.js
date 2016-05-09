@@ -26,11 +26,16 @@ window.Helpers = (function() {
         },
 
         parse(url) {
-            let bits = url.split('?')[1].split('&').map(u => u.split('=')),
+            let bits = url.split('?')[1],
                 params = {};
 
-            bits.forEach(b => params[decodeURIComponent(b[0])] = decodeURIComponent(b[1]));
-            return params;
+            if (bits) {
+                bits = bits.split('&').map(u => u.split('=')),
+                bits.forEach(b => params[decodeURIComponent(b[0])] = decodeURIComponent(b[1]));
+                return params;
+            } else {
+                return {};
+            }
         }
     };
 
